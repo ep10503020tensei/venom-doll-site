@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VENOM DOLL Demo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
+</head>
+<body>
+
+<button id="start">Play VENOM DOLL</button>
+<button id="stop">Stop</button>
+
+<audio id="vocal" src="venom_doll_vocal.mp3"></audio>
+
+<script>
+  const synth = new Tone.Synth().toDestination();
+  const bass = new Tone.MembraneSynth().toDestination();
+  const drum = new Tone.MembraneSynth({ pitchDecay: 0.05 }).toDestination();
+
+  const notes = [
+    { time: 0, note: "E4", duration: "4n" },
+    { time: "0:1", note: "G4", duration: "4n" },
+    { time: "0:2", note: "B4", duration: "4n" },
+    { time: "0:3", note: "D5", duration: "4n" },
+  ];
+
+  const bassNotes = [
+    { time: 0, note: "E2", duration: "2n" },
+    { time: "0:2", note: "C2", duration: "2n" },
+  ];
+
+  const drumPattern = ["C2", null, "C2", null];
+
+  const part = new Tone.Part((time, value) => {
+    synth.triggerAttackRelease(value.note, value.duration, time);
+  }, notes).start(0);
+
+  const bassPart = new Tone.Part((time, value) => {
+    bass.triggerAttackRelease(value.note, value.duration, time);
+  }, bassNotes).start(0);
+
+  const drumPart = new Tone.Sequence((time, note) => {
+    if (note) drum.triggerAttackRelease(note, "8n", time);
+  }, drumPattern, "4n").start(0);
+
+  Tone.Transport.bpm.value = 105;
+
+  document.getElementById("start").onclick = async () => {
+    await Tone.start();
+    Tone.Transport.start();
+    document.getElementById("vocal").play();
+  };
+
+  document.getElementById("stop").onclick = () => {
+    Tone.Transport.stop();
+    document.getElementById("vocal").pause();
+    document.getElementById("vocal").currentTime = 0;
+  };
+</script>
+
+</body>
+</html>
